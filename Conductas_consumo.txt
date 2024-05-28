@@ -1,0 +1,38 @@
+
+(deftemplate cliente
+  (slot nombre)
+  (slot edad)
+  (slot genero))
+
+(deftemplate compra
+  (slot cliente)
+  (slot producto)
+  (slot cantidad)
+  (slot precio)
+  (slot categoria))
+
+; Crear algunos hechos de ejemplo
+
+(deffacts datos-iniciales
+  (cliente (nombre Juan) (edad 30) (genero M))
+  (cliente (nombre Maria) (edad 25) (genero F))
+  (compra (cliente Juan) (producto Leche) (cantidad 3) (precio 1.2) (categoria Lacteos))
+  (compra (cliente Maria) (producto Pan) (cantidad 5) (precio 0.5) (categoria Panaderia))
+  (compra (cliente Juan) (producto Cereal) (cantidad 2) (precio 2.5) (categoria Cereales)))
+
+; Regla para identificar compradores frecuentes de un producto
+
+(defrule comprador-frecuente
+  (compra (cliente ?c) (producto ?p) (cantidad ?q&:(> ?q 2)))
+  =>
+  (printout t ?c " es un comprador frecuente de " ?p crlf))
+
+; Regla para identificar clientes que gastan más de cierta cantidad semanalmente
+
+(defrule gasto-alto
+  ?total <- (bind ?total 0)
+  (compra (cliente ?c) (precio ?p) (cantidad ?q))
+  =>
+  (bind ?total (+ ?total (* ?p ?q)))
+  (if (> ?total 10)
+    then (printout t ?c " gasta más de 10 unidades semanalmente. Total: " ?total crlf)))
